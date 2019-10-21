@@ -14,28 +14,3 @@
 #define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
 #endif
 
-
-# include<iostream>
-
-
-#ifdef USE_NEW_CODE //新代码在下面
-
-int main()
-{
-
-    return 0;
-}
-
-
-
-
-
-#else //旧代码在下面
-
-int main()
-{
-
-    return 0;
-}
-
-#endif
