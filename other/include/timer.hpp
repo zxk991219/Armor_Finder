@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef USE_NEW_CODE
 #undef USE_NEW_CODE
 #endif
@@ -14,28 +16,35 @@
 #define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
 #endif
 
-
-# include <iostream>
+# include <chrono>
 
 
 #ifdef USE_NEW_CODE //新代码在下面
 
-int main()
+namespace sp
 {
 
-    return 0;
+class timer
+{
+public:
+    using clk_t = std::chrono::high_resolution_clock;
+    timer() : m_tp(clk_t::now()){}
+    void reset()
+    {
+        m_tp = clk_t::now();
+    }
+    template <typename T = std::milli>
+    double get() //ms
+    {
+        return std::chrono::duration<double, T>(clk_t::now() - m_tp).count();
+    }
+private:
+    clk_t::time_point m_tp;
+}; //class timer
 }
-
-
-
-
 
 #else //旧代码在下面
 
-int main()
-{
 
-    return 0;
-}
 
 #endif

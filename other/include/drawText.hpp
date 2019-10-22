@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef USE_NEW_CODE
 #undef USE_NEW_CODE
 #endif
@@ -14,28 +16,27 @@
 #define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
 #endif
 
-
-# include <iostream>
+# include <chrono>
+# include <opencv2/opencv.hpp>
 
 
 #ifdef USE_NEW_CODE //新代码在下面
 
-int main()
+namespace sp
 {
-
-    return 0;
+    void drawText(cv::Mat& image);
+    void drawText(cv::Mat& image)
+{
+    cv::putText(image, "Video",
+    cv::Point(20,50),
+    CV_FONT_HERSHEY_COMPLEX, 1,
+    cv::Scalar(255,255,255), 1,
+    LINE_MAX);
 }
-
-
-
-
+}
 
 #else //旧代码在下面
 
-int main()
-{
 
-    return 0;
-}
 
 #endif
