@@ -16,7 +16,6 @@
 #define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
 #endif
 
-
 # include <chrono>
 
 
@@ -37,7 +36,7 @@ public:
     template <typename T = std::milli>
     double get() //ms
     {
-        return std::chrono::duration<double, T>(clk_t::now() - m_tp).count;
+        return std::chrono::duration<double, T>(clk_t::now() - m_tp).count();
     }
 private:
     clk_t::time_point m_tp;
