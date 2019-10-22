@@ -18,7 +18,8 @@
 # include <opencv2/opencv.hpp>
 # include "other/include/timer.hpp"
 # include "other/include/drawText.hpp"
-
+# include <algorithm>
+# include <fstream>
 
 #ifdef USE_NEW_CODE //新代码在下面
 
