@@ -17,30 +17,22 @@
 #endif
 
 # include <chrono>
+# include <opencv2/opencv.hpp>
 
 
 #ifdef USE_NEW_CODE //新代码在下面
 
 namespace sp
 {
-
-class timer
+    void drawText(cv::Mat& image);
+    void drawText(cv::Mat& image)
 {
-public:
-    using clk_t = std::chrono::high_resolution_clock;
-    timer() : m_tp(clk_t::now()){}
-    void reset()
-    {
-        m_tp = clk_t::now();
-    }
-    template <typename T = std::milli>
-    double get() //ms
-    {
-        return std::chrono::duration<double, T>(clk_t::now() - m_tp).count();
-    }
-private:
-    clk_t::time_point m_tp;
-}; //class timer
+    cv::putText(image, "Video",
+    cv::Point(20,50),
+    CV_FONT_HERSHEY_COMPLEX, 1,
+    cv::Scalar(255,255,255), 1,
+    LINE_MAX);
+}
 }
 
 #else //旧代码在下面
