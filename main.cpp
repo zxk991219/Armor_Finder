@@ -1,14 +1,30 @@
-#ifdef USE_NEW_CODE
-#undef USE_NEW_CODE
-#endif
+// #ifdef USE_NEW_CODE
+// #undef USE_NEW_CODE
+// #endif
 
 #ifndef USE_NEW_CODE
 #define USE_NEW_CODE //如果保留这一行,则使用新代码; 如果注释掉这一行,则使用旧代码
 #endif
 
-#ifdef DEBUG
-#undef DEBUG
+// #ifdef USE_CAMERA
+// #undef USE_CAMERA
+// #endif
+
+#ifndef USE_CAMERA
+// #define USE_CAMERA
 #endif
+
+// #ifdef USE_VIDEO
+// #define USE_VIDEO
+// #endif
+
+#ifndef USE_VIDEO
+#define USE_VIDEO
+#endif
+
+// #ifdef DEBUG
+// #undef DEBUG
+// #endif
 
 #ifndef DEBUG
 // #define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
@@ -28,6 +44,7 @@ int main()
     sp::timer timer;
     timer.reset(); //建立计时器
 
+#ifdef USE_CAMERA
     cv::VideoCapture capture;
     capture.open("/dev/v4l/by-path/pci-0000:00:14.0-usb-0:1:1.0-video-index0",CV_CAP_V4L);
     capture.set(3,640);
@@ -59,6 +76,12 @@ int main()
         cv::waitKey(0);
 
     }
+
+#endif
+
+#ifdef USE_VIDEO
+    
+#endif
 
 
     std::cout << "程序运行时间：" << timer.get() << "mm" << std::endl;
