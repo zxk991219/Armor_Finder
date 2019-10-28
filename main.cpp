@@ -22,13 +22,13 @@
 #define USE_NEW_CODE //如果保留这一行,则使用新代码; 如果注释掉这一行,则使用旧代码
 #endif
 
-// #ifndef USE_CAMERA
-// #define USE_CAMERA
-// #endif
-
-#ifndef USE_VIDEO
-#define USE_VIDEO
+#ifndef USE_CAMERA
+#define USE_CAMERA
 #endif
+
+// #ifndef USE_VIDEO
+// #define USE_VIDEO
+// #endif
 
 
 
@@ -37,7 +37,8 @@
 # include "other/include/timer.hpp"
 # include "other/include/drawText.hpp"
 # include <algorithm>
-# include "armor/include//armor_finder/MSER.hpp"
+# include "armor/include/armor_finder/MSER.hpp"
+# include "armor/include/show_images/show_images.hpp"
 
 #ifdef USE_NEW_CODE //新代码在下面
 
@@ -56,8 +57,15 @@ int main()
     capture.open("../Webcam/2019-10-25-172548.webm");
     #endif
     
-    capture.set(3,640);
-    capture.set(4,480); //设定摄像头参数：在网上查
+    capture_set(capture, 640,//WIDTH
+                         480,//HEIGHT
+                         30,//FPS
+                         -64,//BRIGHTNESS,
+                         64,//CONTRAST, 
+                         128,//SATURATION
+                         40,//HUE, const int 
+                         70,//EXPOSURE
+                         )
     //capture.open(1);
 
     cv::Mat src;
