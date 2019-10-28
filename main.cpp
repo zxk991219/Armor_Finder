@@ -57,15 +57,15 @@ int main()
     capture.open("../Webcam/2019-10-25-172548.webm");
     #endif
     
-    capture_set(capture, 640,//WIDTH
+    sp::capture_set(capture, 640,//WIDTH
                          480,//HEIGHT
                          30,//FPS
                          -64,//BRIGHTNESS,
                          64,//CONTRAST, 
                          128,//SATURATION
                          40,//HUE, const int 
-                         70,//EXPOSURE
-                         )
+                         70//EXPOSURE
+                         );
     //capture.open(1);
 
     cv::Mat src;
@@ -88,7 +88,7 @@ int main()
         std::cout << "No capture" << std::endl;
         src = cv::Mat::zeros(480,640,CV_8UC1);
         sp::drawText(src);
-        imshow("image", src);
+        cv::imshow("image", src);
         cv::waitKey(0);
 
     }
