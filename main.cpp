@@ -37,6 +37,7 @@
 # include "other/include/timer.hpp"
 # include "other/include/drawText.hpp"
 # include <algorithm>
+# include "armor/include//armor_finder/MSER.hpp"
 
 #ifdef USE_NEW_CODE //新代码在下面
 
@@ -65,7 +66,7 @@ int main()
         for(;;)
         {
             capture >> src; 
-            // src.resize(640, 480);
+            cv::resize(src,src,cv::Size(640,480),(0,0), (0,0), CV_INTER_AREA);
             if(src.empty())
                 break;
             sp::drawText(src);
