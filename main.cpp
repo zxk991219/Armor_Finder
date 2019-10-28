@@ -47,7 +47,8 @@ int main()
 #ifdef USE_CAMERA
     cv::VideoCapture capture;
     capture.open("/dev/v4l/by-path/pci-0000:00:14.0-usb-0:1:1.0-video-index0",CV_CAP_V4L);
-    // capture.set(); //在网上查
+    capture.set(3,640);
+    capture.set(4,480); //在网上查
     //capture.open(1);
     cv::Mat src;
     if(capture.isOpened())
