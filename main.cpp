@@ -52,18 +52,20 @@ int main()
     #endif
 
     #ifdef USE_VIDEO //使用录像
-    capture.open("../video/video.mp4");
+    capture.open("../Webcam/2019-10-25-172548.webm");
     #endif
-
-    // capture.set(); //设定摄像头参数：在网上查
-    // capture.open(1); //打开摄像头
     
+    capture.set(3,640);
+    capture.set(4,480); //设定摄像头参数：在网上查
+    //capture.open(1);
+
     cv::Mat src;
     if(capture.isOpened())
     {
         for(;;)
         {
             capture >> src; 
+            // src.resize(640, 480);
             if(src.empty())
                 break;
             sp::drawText(src);
