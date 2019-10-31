@@ -39,7 +39,7 @@
 # include <algorithm>
 # include "armor/include/armor_finder/MSER.hpp"
 # include "armor/include/show_images/show_images.hpp"
-
+# include "armor/include/armor_finder/C-color.hpp"
 #ifdef USE_NEW_CODE //新代码在下面
 
 int main()
@@ -58,15 +58,16 @@ int main()
     #endif
     
     sp::capture_set(capture, 640,//WIDTH
-                         480,//HEIGHT
-                         30,//FPS
-                         -64,//BRIGHTNESS,
-                         64,//CONTRAST, 
-                         128,//SATURATION
-                         40,//HUE, const int 
-                         70//EXPOSURE
-                         );
-    //capture.open(1);
+
+                              480,//HEIGHT
+                              30,//FPS
+                             -64,//BRIGHTNESS,
+                              64,//CONTRAST, 
+                              128,//SATURATION
+                              40,//HUE, const int 
+                              70//EXPOSURE
+                     );
+    //capture.open(1)
 
     cv::Mat src;
     if(capture.isOpened())
