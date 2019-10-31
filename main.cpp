@@ -37,6 +37,7 @@
 # include "other/include/timer.hpp"
 # include "other/include/drawText.hpp"
 # include <algorithm>
+# include "armor/include/armor_finder/MSER.hpp"
 # include "armor/include/show_images/show_images.hpp"
 # include "armor/include/armor_finder/C-color.hpp"
 #ifdef USE_NEW_CODE //新代码在下面
@@ -57,6 +58,7 @@ int main()
     #endif
     
     sp::capture_set(capture, 640,//WIDTH
+
                               480,//HEIGHT
                               30,//FPS
                              -64,//BRIGHTNESS,
@@ -73,6 +75,7 @@ int main()
         for(;;)
         {
             capture >> src; 
+            cv::resize(src,src,cv::Size(640,480),(0,0), (0,0), CV_INTER_AREA);
             if(src.empty())
                 break;
             sp::drawText(src);
@@ -86,7 +89,7 @@ int main()
         std::cout << "No capture" << std::endl;
         src = cv::Mat::zeros(480,640,CV_8UC1);
         sp::drawText(src);
-        imshow("image", src);
+        cv::imshow("image", src);
         cv::waitKey(0);
 
     }
