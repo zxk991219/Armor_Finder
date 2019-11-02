@@ -36,10 +36,9 @@
 # include <opencv2/opencv.hpp>
 # include "other/include/timer.hpp"
 # include "other/include/drawText.hpp"
-# include <algorithm>
-# include "armor/include/armor_finder/MSER.hpp"
 # include "armor/include/show_images/show_images.hpp"
 # include "armor/include/armor_finder/C-color.hpp"
+# include "armor/include/armor_finder/distance.hpp"
 #ifdef USE_NEW_CODE //新代码在下面
 
 int main()
