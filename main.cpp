@@ -22,13 +22,13 @@
 #define USE_NEW_CODE //如果保留这一行,则使用新代码; 如果注释掉这一行,则使用旧代码
 #endif
 
-#ifndef USE_CAMERA
-#define USE_CAMERA
-#endif
-
-// #ifndef USE_VIDEO
-// #define USE_VIDEO
+// #ifndef USE_CAMERA
+// #define USE_CAMERA
 // #endif
+
+#ifndef USE_VIDEO
+#define USE_VIDEO
+#endif
 
 
 
@@ -37,27 +37,35 @@
 # include "other/include/timer.hpp"
 # include "other/include/drawText.hpp"
 # include "armor/include/show_images/show_images.hpp"
+# include "armor/include/armor_finder/MSER.hpp"
 # include "armor/include/armor_finder/C-color.hpp"
-# include "armor/include/armor_finder/distance.hpp"
-#ifdef USE_NEW_CODE //新代码在下面
+// # include "armor/include/armor_finder/distance.hpp"
+
+# ifdef USE_NEW_CODE //新代码在下面
 
 int main()
 {
-    sp::timer timer;
-    timer.reset(); //建立计时器
+    sp::timer timer; //建立计时器
 
     cv::VideoCapture capture;
+
+
 
     #ifdef USE_CAMERA //使用摄像头
     capture.open("/dev/v4l/by-path/pci-0000:00:14.0-usb-0:1:1.0-video-index0",CV_CAP_V4L);
     #endif
 
     #ifdef USE_VIDEO //使用录像
-    capture.open("../Webcam/2019-10-25-172548.webm");
+    // capture.open("../Video/2019-10-28-222635.webm");
+    capture.open("../Video/2019-10-28-223802.webm");
+    // capture.open("../Video/2019-10-28-223826.webm");
+    // capture.open("../Video/2019-10-28-223848.webm");
     #endif
     
-    sp::capture_set(capture, 640,//WIDTH
 
+
+
+    sp::capture_set(capture, 640,//WIDTH
                               480,//HEIGHT
                               30,//FPS
                              -64,//BRIGHTNESS,
@@ -71,14 +79,22 @@ int main()
     cv::Mat src;
     if(capture.isOpened())
     {
-        for(;;)
+        for(;;) //读取视频循环
         {
             capture >> src; 
             cv::resize(src,src,cv::Size(640,480),(0,0), (0,0), CV_INTER_AREA);
+            // cv::cvtColor(src,src,CV_RGB2GRAY);
+            timer.reset(); // 开始计时
+
             if(src.empty())
                 break;
-            sp::drawText(src);
+
+            src = sp::mser(src);
+            // sp::drawText(src);
             cv::imshow("image", src);
+
+            std::cout << "程序运行时间：" << timer.get() << "ms" << std::endl; //结束计时
+
             if(cv::waitKey(10) >= 10)
                 break;
         }
@@ -93,7 +109,6 @@ int main()
 
     }
 
-    std::cout << "程序运行时间：" << timer.get() << "mm" << std::endl;
     return 0;
 }
 
