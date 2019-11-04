@@ -90,7 +90,28 @@ cv::Mat& mser(cv::Mat& mat)
 	
 	sp::proportion_thresh(mat, mat, 255, 0.05); //二值化图像
 
-	auto mser = cv::MSER::create();
+	auto mser = cv::MSER::create(	5, // _delta 灰度值的变化量
+									5, //_min_area 检测到的组块⾯积的范围
+									14400, //_max_area 检测到的组块⾯积的范围
+									0.1, //_max_variation 最⼤的变化率
+									0.2, // _min_diversity 稳定区域的最⼩变换量
+									200, //  _max_evolution 对彩⾊图像的MSER检测
+									1.01, // _area_threshold 
+									0.003, // _min_margin 
+									5 // _edge_blur_size 
+									); 
+
+	// auto mser = cv::MSER::create(	5, // _delta 灰度值的变化量
+	// 								60, //_min_area 检测到的组块⾯积的范围
+	// 								14400, //_max_area 检测到的组块⾯积的范围
+	// 								0.25, //_max_variation 最⼤的变化率
+	// 								0.2, // _min_diversity 稳定区域的最⼩变换量
+	// 								200, // 对彩⾊图像的MSER检测
+	// 								1.01, //
+	// 								0.003, //
+	// 								5 //
+	// 								); 
+									
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Rect>               bboxes;
 	std::vector<cv::Rect>               bboxes_light;
