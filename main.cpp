@@ -30,7 +30,17 @@
 #define USE_VIDEO
 #endif
 
+#ifndef USE_RED
+#define USE_RED
+#endif
 
+// #ifndef USE_BLUE
+// #define USE_BLUE
+// #endif
+
+// #ifndef USE_GREEN
+// #define USE_GREEN
+// #endif
 
 # include <iostream>
 # include <opencv2/opencv.hpp>
@@ -76,6 +86,7 @@ int main()
                      );
     //capture.open(1)
 
+
     cv::Mat src;
     if(capture.isOpened())
     {
@@ -84,11 +95,37 @@ int main()
             capture >> src; 
             cv::resize(src,src,cv::Size(640,480),(0,0), (0,0), CV_INTER_AREA);
             // cv::cvtColor(src,src,CV_RGB2GRAY);
+            cv::imshow("image_beforeMSER", src);
+            
+            std::vector<cv::Mat> channels;//定义Mat类型的向量
+            cv::split(src, channels);//通道分离
+            cv::Mat blue = channels.at(0);
+            cv::Mat green = channels.at(1);
+            cv::Mat red = channels.at(2);
+
+            // cv::imshow("image_blue", blue);
+            // cv::imshow("image_green", green);
+            // cv::imshow("image_red", red);
+
+            #ifdef USE_RED
+            src = red;
+            #endif
+
+            #ifdef USE_BLUE
+            src = blue;
+            #endif
+
+            #ifdef USE_GREEN
+            src = green;
+            #endif
+
+
             timer.reset(); // 开始计时
 
             if(src.empty())
                 break;
 
+            // cv::imshow("image_beforeMSER", src);
             src = sp::mser(src);
             // sp::drawText(src);
             cv::imshow("image", src);
