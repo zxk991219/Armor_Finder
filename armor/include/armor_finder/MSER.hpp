@@ -15,6 +15,14 @@
 #define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
 #endif
 
+#ifndef SHOW_LIGHT
+#define SHOW_LIGHT
+#endif
+
+#ifndef SHOW_ARMOR
+#define SHOW_ARMOR
+#endif
+
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
@@ -40,6 +48,57 @@ float iou(const cv::Rect& lhs, const cv::Rect& rhs)
 	return static_cast<float>(inner_area) / (lhs.area() + rhs.area() - inner_area);
 }
 
+bool bboxes_light_is_ok(const cv::Mat& in, double max_val, double proportion, int thresh_value)
+{
+	int rows = in.rows;
+	int cols = in.cols;
+	
+	// cv::cvtColor(in, in, CV_RGB2GRAY);//不知道为什么在这里灰度图像会报错
+
+	if(in.isContinuous())
+	{
+		cols *= rows;
+		rows = 1;
+	}
+	std::vector<uchar> color_value(rows*cols);
+	int pos = 0;
+	for(int i=0;i<rows;i++)
+	{
+		for(int j=0;j<cols;j++)
+		{
+			color_value[pos++] = in.at<uchar>(i,j);
+		}
+	}
+	std::nth_element(color_value.begin(), color_value.end()-rows*cols*proportion, color_value.end());
+	auto thre_iterator = color_value.end()-rows*cols*proportion;
+	uchar threshold = *thre_iterator;
+
+	int threshold_int = (int)threshold;
+
+	std::cout << "threshold=" << threshold_int << std::endl; //打印计算得出的threshold
+
+	if(threshold_int>=thresh_value) // 晒亮度
+	{
+		// hsv筛颜色
+		if(true)
+		{
+
+			return true;
+		}
+		#ifdef DEBUG
+		std::cout << "true" << std::endl;
+		#endif
+	}
+	else 
+	{
+		return false;
+		#ifdef DEBUG
+		std::cout << "false" << std::endl;
+		#endif
+	}
+	
+}
+
 bool bboxes_armor_isok(const cv::Rect& rect_l, const cv::Rect& rect_r)
 {
 	const double egde_l = std::min(rect_l.x, rect_r.x);
@@ -54,8 +113,8 @@ bool bboxes_armor_isok(const cv::Rect& rect_l, const cv::Rect& rect_r)
 
 	// 判断是否为装甲板
 	
-	if(bbox_armor_height/bbox_armor_width<0.4
-	&& bbox_armor_height/bbox_armor_width>0.1)
+	if(bbox_armor_height/bbox_armor_width<0.5
+	&& bbox_armor_height/bbox_armor_width>0.2)
 	{
 		return true;
 	}
@@ -83,19 +142,22 @@ cv::Rect get_armor(const cv::Rect& rect_l, const cv::Rect& rect_r)
 	return armor;
 }
 
-cv::Mat& mser(cv::Mat& mat)
+cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 {
 	cv::Mat img_show;
 	
 	// cv::resize(mat, mat, {640, 480});
 	
-	sp::proportion_thresh(mat, mat, 255, 0.02); //二值化图像
-	
+	double thresh_binar = 0.02; //二值化取thresh_binar最亮部分
 	double bbox_proportion_thresh_max = 0.9; //设定bbox的宽高比上阈值
 	double bbox_proportion_thresh_min = 0.0; //设定bbox的宽高比下阈值
-	constexpr float thresh = 0.8; //IOU的阈值
+	constexpr float thresh_iou = 0.8; //IOU的阈值
+	int thresh_value = 250; // bboxes_light的色度阈值
 
-	auto mser = cv::MSER::create(	5, // _delta 灰度值的变化量
+	sp::proportion_thresh(mat, mat, 255, thresh_binar); //二值化图像
+
+
+	auto mser = cv::MSER::create(	1, // _delta 灰度值的变化量
 									60, //_min_area 检测到的组块⾯积的范围
 									14400, //_max_area 检测到的组块⾯积的范围
 									0.25, //_max_variation 最⼤的变化率
@@ -148,7 +210,11 @@ cv::Mat& mser(cv::Mat& mat)
 		else
 		{
 			// 画灯条矩形
+			#ifdef SHOW_LIGHT
 			cv::rectangle(mat, bboxes.front(), {255}, 2);
+			cv::rectangle(mat_real, bboxes.front(), {0,255,0}, 2);
+			#endif
+
 			drawed_rects.push_back(0);
 		}	
 	}
@@ -157,7 +223,7 @@ cv::Mat& mser(cv::Mat& mat)
 	{
 		bool skip = false;
 		for (auto&& index : drawed_rects)
-			if (skip = (sp::iou(bboxes[i], bboxes[index]) > thresh))
+			if (skip = (sp::iou(bboxes[i], bboxes[index]) > thresh_iou))
 				break;
 		if (skip)
 			continue;
@@ -169,11 +235,22 @@ cv::Mat& mser(cv::Mat& mat)
 		// else if(bboxes[i].height/bboxes[i].width < bbox_proportion_thresh_min);
 		else
 		{
-			// 画灯条矩形
-			cv::rectangle(mat, bboxes[i], {255}, 2);
-			drawed_rects.push_back(i);
-			++cnt;
-			bboxes_light.push_back(bboxes[i]);
+
+			cv::Mat imagePart=mat_real(bboxes[i]); //抠图
+			if(bboxes_light_is_ok(imagePart, 255, thresh_binar, thresh_value))
+			{
+				cv::imshow("test",imagePart);
+				
+				// 画灯条矩形
+				#ifdef SHOW_LIGHT
+				cv::rectangle(mat, bboxes[i], {255}, 2);
+				cv::rectangle(mat_real, bboxes[i], {0,255,0}, 2);
+				#endif
+				
+				drawed_rects.push_back(i);
+				++cnt;
+				bboxes_light.push_back(bboxes[i]);
+			}
 		}		
 	}
 
@@ -192,7 +269,7 @@ cv::Mat& mser(cv::Mat& mat)
 	{
 		bool skip = false;
 		for (int n=m;n<bboxes_armor.size();n++)
-			if (skip = (sp::iou(bboxes_armor[m], bboxes_armor[n]) > thresh) && m!=n)
+			if (skip = (sp::iou(bboxes_armor[m], bboxes_armor[n]) > thresh_iou) && m!=n)
 				break;
 		if (skip)
 			continue;
@@ -203,7 +280,10 @@ cv::Mat& mser(cv::Mat& mat)
 	for (int p=0;p<bboxes_armor_selected.size();p++)
 	{
 		// 画装甲板矩形
+		#ifdef SHOW_ARMOR
 		cv::rectangle(mat, bboxes_armor_selected[p], {255}, 2);
+		cv::rectangle(mat_real, bboxes_armor_selected[p], {0,0,255}, 2);
+		#endif
 	}
 
 	#ifdef DEBUG
@@ -246,6 +326,52 @@ float iou(const cv::Rect& lhs, const cv::Rect& rhs)
 	return static_cast<float>(inner_area) / (lhs.area() + rhs.area() - inner_area);
 }
 
+bool bboxes_light_is_ok(const cv::Mat& in, double max_val, double proportion, int thresh_value)
+{
+	int rows = in.rows;
+	int cols = in.cols;
+	
+	// cv::cvtColor(in, in, CV_RGB2GRAY);//不知道为什么在这里灰度图像会报错
+
+	if(in.isContinuous())
+	{
+		cols *= rows;
+		rows = 1;
+	}
+	std::vector<uchar> color_value(rows*cols);
+	int pos = 0;
+	for(int i=0;i<rows;i++)
+	{
+		for(int j=0;j<cols;j++)
+		{
+			color_value[pos++] = in.at<uchar>(i,j);
+		}
+	}
+	std::nth_element(color_value.begin(), color_value.end()-rows*cols*proportion, color_value.end());
+	auto thre_iterator = color_value.end()-rows*cols*proportion;
+	uchar threshold = *thre_iterator;
+
+	int threshold_int = (int)threshold;
+
+	std::cout << "threshold=" << threshold_int << std::endl; //打印计算得出的threshold
+
+	if(threshold_int>=thresh_value) 
+	{
+		return true;
+		#ifdef DEBUG
+		std::cout << "true" << std::endl;
+		#endif
+	}
+	else 
+	{
+		return false;
+		#ifdef DEBUG
+		std::cout << "false" << std::endl;
+		#endif
+	}
+	
+}
+
 bool bboxes_armor_isok(const cv::Rect& rect_l, const cv::Rect& rect_r)
 {
 	const double egde_l = std::min(rect_l.x, rect_r.x);
@@ -260,8 +386,8 @@ bool bboxes_armor_isok(const cv::Rect& rect_l, const cv::Rect& rect_r)
 
 	// 判断是否为装甲板
 	
-	if(bbox_armor_height/bbox_armor_width<0.3
-	&& bbox_armor_height/bbox_armor_width>0.15)
+	if(bbox_armor_height/bbox_armor_width<0.5
+	&& bbox_armor_height/bbox_armor_width>0.2)
 	{
 		return true;
 	}
@@ -289,21 +415,28 @@ cv::Rect get_armor(const cv::Rect& rect_l, const cv::Rect& rect_r)
 	return armor;
 }
 
-cv::Mat& mser(cv::Mat& mat)
+cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 {
 	cv::Mat img_show;
 	
 	// cv::resize(mat, mat, {640, 480});
 	
-	sp::proportion_thresh(mat, mat, 255, 0.05); //二值化图像
+	double thresh_binar = 0.02; //二值化取thresh_binar最亮部分
+	double bbox_proportion_thresh_max = 0.9; //设定bbox的宽高比上阈值
+	double bbox_proportion_thresh_min = 0.0; //设定bbox的宽高比下阈值
+	constexpr float thresh_iou = 0.8; //IOU的阈值
+	int thresh_value = 250; // bboxes_light的色度阈值
 
-	auto mser = cv::MSER::create(	5, // _delta 灰度值的变化量
-									1, //_min_area 检测到的组块⾯积的范围
+	sp::proportion_thresh(mat, mat, 255, thresh_binar); //二值化图像
+
+
+	auto mser = cv::MSER::create(	1, // _delta 灰度值的变化量
+									60, //_min_area 检测到的组块⾯积的范围
 									14400, //_max_area 检测到的组块⾯积的范围
-									0.1, //_max_variation 最⼤的变化率
+									0.25, //_max_variation 最⼤的变化率
 									0.2, // _min_diversity 稳定区域的最⼩变换量
-									255, //  _max_evolution 对彩⾊图像的MSER检测
-									1.2, // _area_threshold 
+									200, //  _max_evolution 对彩⾊图像的MSER检测
+									1.01, // _area_threshold 
 									0.003, // _min_margin 
 									5 // _edge_blur_size 
 									); 
@@ -335,10 +468,6 @@ cv::Mat& mser(cv::Mat& mat)
 	drawed_rects.reserve(bboxes.size() / 4);
 	bboxes_light.reserve(drawed_rects.size());
 
-	double bbox_proportion_thresh_max = 5.0; //设定bbox的高宽比上阈值
-	double bbox_proportion_thresh_min = 1.0; //设定bbox的高宽比下阈值
-	constexpr float thresh = 0.5; //IOU的阈值
-
 	// 筛选bbox并将bbox画在图像上
 
 	int cnt = 0;
@@ -347,46 +476,55 @@ cv::Mat& mser(cv::Mat& mat)
 		++cnt;
 
 		//筛选bboxes
-		if(bboxes.front().width/bboxes.front().height > bbox_proportion_thresh_max);
-		// else if(bboxes.front().height/bboxes.front().width > bbox_proportion_thresh_max);
-		// else if(bboxes.front().width/bboxes.front().height < bbox_proportion_thresh_min);
-		else if(bboxes.front().height/bboxes.front().width < bbox_proportion_thresh_min);
-		else
+		if(bboxes.front().width/bboxes.front().height < bbox_proportion_thresh_max
+		&& bboxes.front().width/bboxes.front().height > bbox_proportion_thresh_min)
 		{
 			// 画灯条矩形
-			cv::rectangle(mat, bboxes.front(), {0, 0, 255}, 2);
+			#ifdef SHOW_LIGHT
+			cv::rectangle(mat, bboxes.front(), {255}, 2);
+			#endif
+
 			drawed_rects.push_back(0);
-		}	
+		}
+		else {}
 	}
 
 	for (int i = 1; i < bboxes.size(); ++i)
 	{
 		bool skip = false;
 		for (auto&& index : drawed_rects)
-			if (skip = (sp::iou(bboxes[i], bboxes[index]) > thresh))
+			if (skip = (sp::iou(bboxes[i], bboxes[index]) > thresh_iou))
 				break;
 		if (skip)
 			continue;
 		
 		//筛选bboxes
-		if(bboxes[i].width/bboxes[i].height > bbox_proportion_thresh_max);
-		// else if(bboxes[i].height/bboxes[i].width > bbox_proportion_thresh_max);
-		// else if(bboxes[i].width/bboxes[i].height < bbox_proportion_thresh_min);
-		else if(bboxes[i].height/bboxes[i].width < bbox_proportion_thresh_min);
-		else
+		if(bboxes.front().width/bboxes.front().height < bbox_proportion_thresh_max
+		&& bboxes.front().width/bboxes.front().height > bbox_proportion_thresh_min)
 		{
-			// 画灯条矩形
-			cv::rectangle(mat, bboxes[i], {0, 0, 255}, 2);
-			drawed_rects.push_back(i);
-			++cnt;
-			bboxes_light.push_back(bboxes[i]);
-		}		
+			cv::Mat imagePart=mat_real(bboxes[i]); //抠图
+			if(bboxes_light_is_ok(imagePart, 255, thresh_binar, thresh_value))
+			{
+				cv::imshow("test",imagePart);
+				
+				// 画灯条矩形
+				#ifdef SHOW_LIGHT
+				cv::rectangle(mat, bboxes[i], {255}, 2);
+				#endif
+				
+				drawed_rects.push_back(i);
+				++cnt;
+				bboxes_light.push_back(bboxes[i]);
+			}
+		}
+		else {}
 	}
 
 	for (int k = 0; k < bboxes_light.size(); k++)
 	{
 		bool skip_light = false;
 		for (int l=0;l<bboxes_light.size();l++)
+			// 获取bboxes_armor并筛选
 			if (skip_light = sp::bboxes_armor_isok(bboxes_light[k], bboxes_light[l]) && l!=k)// 筛选条件
 			{
 				bboxes_armor.push_back(sp::get_armor(bboxes_light[k], bboxes_light[l]));
@@ -398,18 +536,19 @@ cv::Mat& mser(cv::Mat& mat)
 	{
 		bool skip = false;
 		for (int n=m;n<bboxes_armor.size();n++)
-			if (skip = (sp::iou(bboxes_armor[m], bboxes_armor[n]) > 0.3) && m!=n)
+			if (skip = (sp::iou(bboxes_armor[m], bboxes_armor[n]) > thresh_iou) && m!=n)
 				break;
-		bboxes_armor_selected.push_back(bboxes_armor[m]);
-		std::cout<<"pushed";
 		if (skip)
 			continue;
+		bboxes_armor_selected.push_back(bboxes_armor[m]);
+		std::cout<<"pushed";
 	}
 
 	for (int p=0;p<bboxes_armor_selected.size();p++)
 	{
 		// 画装甲板矩形
-		cv::rectangle(mat, bboxes_armor_selected[p], {0, 0, 255}, 2);
+		cv::rectangle(mat, bboxes_armor_selected[p], {255}, 2);
+		cv::rectangle(mat_real, bboxes_armor_selected[p], {0,0,255}, 2);
 	}
 
 	#ifdef DEBUG
@@ -421,5 +560,4 @@ cv::Mat& mser(cv::Mat& mat)
 }
 
 }
-
 #endif

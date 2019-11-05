@@ -88,17 +88,17 @@ int main()
 
 
     cv::Mat src;
+    cv::Mat src_real;
+
     if(capture.isOpened())
     {
         for(;;) //读取视频循环
         {
-            capture >> src; 
-            cv::resize(src,src,cv::Size(640,480),(0,0), (0,0), CV_INTER_AREA);
-            // cv::cvtColor(src,src,CV_RGB2GRAY);
-            cv::imshow("image_beforeMSER", src);
+            capture >> src_real; 
+            cv::resize(src_real,src_real,cv::Size(640,480),(0,0), (0,0), CV_INTER_AREA);
             
             std::vector<cv::Mat> channels;//定义Mat类型的向量
-            cv::split(src, channels);//通道分离
+            cv::split(src_real, channels);//通道分离
             cv::Mat blue = channels.at(0);
             cv::Mat green = channels.at(1);
             cv::Mat red = channels.at(2);
@@ -126,9 +126,11 @@ int main()
                 break;
 
             // cv::imshow("image_beforeMSER", src);
-            src = sp::mser(src);
+            src = sp::mser(src, src_real);
             // sp::drawText(src);
             cv::imshow("image", src);
+            cv::imshow("image_beforeMSER", src_real);
+
 
             std::cout << "程序运行时间：" << timer.get() << "ms" << std::endl; //结束计时
 
