@@ -1,9 +1,26 @@
 #pragma once
 
+// #ifdef USE_NEW_CODE
+// #undef USE_NEW_CODE
+// #endif
+
+// #ifdef DEBUG
+// #undef DEBUG
+// #endif
+
+
+
+
+// 开始define
+
+// #define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
+// #define USE_NEW_CODE //如果保留这一行,则使用新代码; 如果注释掉这一行,则使用旧代码
+
 # include <opencv2/opencv.hpp>
 # include <vector>
 # include <algorithm>
 
+#ifdef USE_NEW_CODE
 namespace sp
 {
     void proportion_thresh(const cv::Mat&, const cv::Mat&, double, double);
@@ -36,7 +53,9 @@ namespace sp
 
         int threshold_int = (int)threshold;
 
+        #ifdef DEBUG
         std::cout << "han's threshold=" << threshold_int << std::endl; //打印计算得出的threshold
+        #endif
 
         cv::threshold(in, out, threshold_int, 255, CV_THRESH_BINARY);
     }
@@ -66,3 +85,7 @@ namespace sp
     }
 
 }
+
+#else
+
+#endif

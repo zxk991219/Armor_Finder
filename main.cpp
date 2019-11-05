@@ -1,46 +1,30 @@
-// #ifdef USE_NEW_CODE
-// #undef USE_NEW_CODE
-// #endif
-
-// #ifdef USE_CAMERA
-// #undef USE_CAMERA
-// #endif
-
-// #ifdef USE_VIDEO
-// #define USE_VIDEO
-// #endif
-
-// #ifdef DEBUG
-// #undef DEBUG
-// #endif
-
-#ifndef DEBUG
-#define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
+#ifdef USE_NEW_CODE
+#undef USE_NEW_CODE
 #endif
 
-#ifndef USE_NEW_CODE
+#ifdef DEBUG
+#undef DEBUG
+#endif
+
+
+
+
+
+// 开始define
+
+
+
+
+// #define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
+
 #define USE_NEW_CODE //如果保留这一行,则使用新代码; 如果注释掉这一行,则使用旧代码
-#endif
 
-// #ifndef USE_CAMERA
 // #define USE_CAMERA
-// #endif
-
-#ifndef USE_VIDEO
 #define USE_VIDEO
-#endif
 
-#ifndef USE_RED
 #define USE_RED
-#endif
-
-// #ifndef USE_BLUE
 // #define USE_BLUE
-// #endif
-
-// #ifndef USE_GREEN
 // #define USE_GREEN
-// #endif
 
 # include <iostream>
 # include <opencv2/opencv.hpp>
@@ -48,7 +32,7 @@
 # include "other/include/drawText.hpp"
 # include "armor/include/show_images/show_images.hpp"
 # include "armor/include/armor_finder/MSER.hpp"
-# include "armor/include/armor_finder/C-color.hpp"
+// # include "armor/include/armor_finder/C-color.hpp"
 // # include "armor/include/armor_finder/distance.hpp"
 
 # ifdef USE_NEW_CODE //新代码在下面
@@ -103,10 +87,6 @@ int main()
             cv::Mat green = channels.at(1);
             cv::Mat red = channels.at(2);
 
-            // cv::imshow("image_blue", blue);
-            // cv::imshow("image_green", green);
-            // cv::imshow("image_red", red);
-
             #ifdef USE_RED
             src = red;
             #endif
@@ -128,9 +108,12 @@ int main()
             // cv::imshow("image_beforeMSER", src);
             src = sp::mser(src, src_real);
             // sp::drawText(src);
+            
+            #ifdef DEBUG
             cv::imshow("image", src);
+            #endif
+            
             cv::imshow("image_beforeMSER", src_real);
-
 
             std::cout << "程序运行时间：" << timer.get() << "ms" << std::endl; //结束计时
 
