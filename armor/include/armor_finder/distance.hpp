@@ -1,15 +1,17 @@
+# pragma once
+
 # include <iostream>
 # include <opencv2/opencv.hpp>
 # include <string>
-# define KNOWN_WIDTH 10 //占位数据
-# define FOCI 10 //占位数据
+# define KNOWN_WIDTH 6.0236 //占位数据
+# define FOCI 0.1693 //占位数据
 
 #ifdef USE_NEW_CODE //新代码在下面
 
 namespace sp
 {
-    void getBoxDistance(cv::Mat& frame , std::vector<cv::Rect> bboxes_armor)
- {
+void getBoxDistance(cv::Mat& frame , std::vector<cv::Rect> bboxes_armor)
+{
     std::vector<int> P_WIDTH;
     int i;
     cv::Rect rect;
@@ -19,9 +21,10 @@ namespace sp
          int p_width=rect.width;
          P_WIDTH.push_back(p_width);
          double distance=FOCI * KNOWN_WIDTH / p_width;
+
          cv::Point origin;
-         origin.x = rect.tl+rect.width;
-	     origin.y = rect.br+rect.height;
+         origin.x = rect.tl().x+rect.width;
+	     origin.y = rect.br().y+rect.height;
          double fontScale=2;
          double data= distance *30.48/ 12;//转化为厘米为单位
          std::string text= std::to_string( data);
@@ -35,7 +38,7 @@ namespace sp
                       8,//线型
                       0);
      }
- }
+}
 }
 
 

@@ -6,14 +6,7 @@
 #undef DEBUG
 #endif
 
-
-
-
-
 // 开始define
-
-
-
 
 // #define DEBUG
 
@@ -34,6 +27,7 @@
 #endif
 
 #define SHOW_ARMOR_WHOLE
+#define SHOW_DISTANCE
 
 # include <iostream>
 # include <opencv2/opencv.hpp>
@@ -80,6 +74,8 @@ int main()
     
     cv::Mat src;
     cv::Mat src_real;
+    capture >> src_real; 
+
 
     if(capture.isOpened())
     {
