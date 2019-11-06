@@ -1,30 +1,17 @@
 #pragma once
 
-// #ifdef USE_NEW_CODE
-// #undef USE_NEW_CODE
-// #endif
-
-// #ifdef DEBUG
-// #undef DEBUG
-// #endif
-
-
-
-
-// 开始define
-
-// #define DEBUG //在程序中用 #ifdef DEBUG 与 #endif 将debug代码块框起来,实现debug输出 
-// #define USE_NEW_CODE //如果保留这一行,则使用新代码; 如果注释掉这一行,则使用旧代码
-
-// #define SHOW_LIGHT
-// #define SHOW_ARMOR
-#define SHOW_ARMOR_WHOLE
-
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
 #include "proportion_thresh.hpp"
 #include <algorithm>
+
+#ifdef DEBUG
+#define SHOW_LIGHT
+#define SHOW_ARMOR
+#endif
+
+#define SHOW_ARMOR_WHOLE
 
 #ifdef USE_NEW_CODE //新代码在下面
 
@@ -51,7 +38,6 @@ bool bboxes_light_is_ok(const cv::Mat& in, double max_val, double proportion, in
 	int rows = in.rows;
 	int cols = in.cols;
 	
-	// cv::cvtColor(in, in, CV_RGB2GRAY);//不知道为什么在这里灰度图像会报错
 
 	if(in.isContinuous())
 	{
@@ -418,8 +404,6 @@ bool bboxes_light_is_ok(const cv::Mat& in, double max_val, double proportion, in
 	int rows = in.rows;
 	int cols = in.cols;
 	
-	// cv::cvtColor(in, in, CV_RGB2GRAY);//不知道为什么在这里灰度图像会报错
-
 	if(in.isContinuous())
 	{
 		cols *= rows;

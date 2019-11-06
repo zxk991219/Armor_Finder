@@ -31,8 +31,6 @@ namespace sp
         int rows = in.rows;
         int cols = in.cols;
         
-        // cv::cvtColor(in, in, CV_RGB2GRAY);//不知道为什么在这里灰度图像会报错
-
         if(in.isContinuous())
         {
             cols *= rows;
