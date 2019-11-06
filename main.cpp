@@ -15,7 +15,7 @@
 
 
 
-// #define DEBUG 
+// #define DEBUG
 
 #define USE_NEW_CODE
 
@@ -28,6 +28,12 @@
 #define USE_RED
 // #define USE_BLUE
 
+#ifdef DEBUG
+#define SHOW_LIGHT
+#define SHOW_ARMOR
+#endif
+
+#define SHOW_ARMOR_WHOLE
 
 # include <iostream>
 # include <opencv2/opencv.hpp>
@@ -99,11 +105,11 @@ int main()
             src = sp::mser(src, src_real);
             // sp::drawText(src);
             
+            cv::imshow("image_beforeMSER", src_real);
+
             #ifdef DEBUG
             cv::imshow("image", src);
             #endif
-            
-            cv::imshow("image_beforeMSER", src_real);
 
             std::cout << "程序运行时间：" << timer.get() << "ms" << std::endl; //结束计时
 

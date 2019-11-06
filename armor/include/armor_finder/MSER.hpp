@@ -6,13 +6,6 @@
 #include "proportion_thresh.hpp"
 #include <algorithm>
 
-#ifdef DEBUG
-#define SHOW_LIGHT
-#define SHOW_ARMOR
-#endif
-
-#define SHOW_ARMOR_WHOLE
-
 #ifdef USE_NEW_CODE //新代码在下面
 
 namespace sp
