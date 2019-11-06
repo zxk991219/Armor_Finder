@@ -22,8 +22,8 @@
 // #define USE_CAMERA
 #define USE_VIDEO
 
-#define USE_RGB
-// #define USE_HSV
+#define USE_RGB_FILTER
+// #define USE_HSV_FILTER
 
 #define USE_RED
 // #define USE_BLUE
@@ -82,40 +82,13 @@ int main()
             capture >> src_real; 
             cv::resize(src_real,src_real,cv::Size(640,480),(0,0), (0,0), CV_INTER_AREA);
             
-
-
-
-            #ifdef USE_RGB
-
-            std::vector<cv::Mat> channels;//定义Mat类型的向量
-            cv::split(src_real, channels);//通道分离
-            cv::Mat blue = channels.at(0);
-            cv::Mat green = channels.at(1);
-            cv::Mat red = channels.at(2);
-
-            #ifdef USE_RED
-            src = red;
+            #ifdef USE_RGB_FILTER
+            sp::rgbColorFilter(src_real, src);
             #endif
 
-            #ifdef USE_BLUE
-            src = blue;
+            #ifdef USE_HSV_FILTER
+            sp::hsvColorFilter(src_real, src);
             #endif
-
-            #ifdef USE_GREEN
-            src = green;
-            #endif
-
-            #endif
-
-
-
-
-            #ifdef USE_HSV
-            sp::colorFilter(src_real, src);
-            #endif
-
-
-
 
             timer.reset(); // 开始计时
 

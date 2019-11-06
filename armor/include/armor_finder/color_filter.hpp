@@ -4,7 +4,25 @@
 
 namespace sp
 {
-void colorFilter(cv::Mat& inputImage, cv::Mat& outputImage)
+
+void rgbColorFilter(cv::Mat& src_real, cv::Mat& src)
+{
+	std::vector<cv::Mat> channels;//定义Mat类型的向量
+	cv::split(src_real, channels);//通道分离
+	cv::Mat blue = channels.at(0);
+	cv::Mat green = channels.at(1);
+	cv::Mat red = channels.at(2);
+
+	#ifdef USE_RED
+	src = red;
+	#endif
+
+	#ifdef USE_BLUE
+	src = blue;
+	#endif
+
+}
+void hsvColorFilter(cv::Mat& inputImage, cv::Mat& outputImage)
 {
 	int i, j;
 
