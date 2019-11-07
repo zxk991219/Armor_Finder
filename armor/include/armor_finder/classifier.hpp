@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <opencv2/opencv.hpp>
 #include "proportion_thresh.hpp"
-
+#include <chrono>
 
 
 # ifdef USE_NEW_CODE
@@ -60,7 +60,10 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 	// 	rows = 1;
 	// }
 
-	// cv::resize(src_grey, src_grey, cv::Size(cols, rows), (0,0), (0,0), CV_INTER_AREA); //将截取图像的大小变成60*50
+	rows = 50;
+	cols = 60;
+
+	cv::resize(src_grey, src_grey, cv::Size(cols, rows), (0,0), (0,0), CV_INTER_AREA);
 
 	// 读入模板图像文件
 	std::ifstream template_filename_in(template_filename_list); //读入模板图像文件名文件
@@ -68,7 +71,7 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 	
 	int gain = 0; //初始化gain
 	std::vector<int> gain_list; //声明容器gain_list来放置每个图像的gain
-	int count = 1;
+	int count_armor = 1;
 
 	while(getline(template_filename_in, template_filename))
 	{
@@ -83,8 +86,7 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 		cv::resize(template_image_grey, template_image_grey, cv::Size(cols, rows), (0,0), (0,0), CV_INTER_AREA);
 		
 		#ifdef DEBUG
-		// cv::imshow("template_filename",template_image_grey);
-		std::cout << "读入" << count << "号装甲板模板" << std::endl;
+		std::cout << "读入" << count_armor << "号装甲板模板" << std::endl;
 		#endif
 
 		// 逐像素获取每个像素的gain并累积
@@ -106,11 +108,11 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 		gain_list.push_back(gain); //将gain加入gain_list
 
 		#ifdef DEBUG
-		std::cout << count << "号装甲板的gain是" << gain << std::endl; //显示gain
+		std::cout << count_armor << "号装甲板的gain是" << gain << std::endl; //显示gain
 		#endif
 
 		gain = 0; //重置gain
-		count++;
+		count_armor++;
 	}
 
 	auto min = std::min_element(gain_list.begin(), gain_list.end());
@@ -121,10 +123,27 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 	std::cout << "这组图像的最大gain是" << *max << std::endl;
 	#endif
 
-	if(*max<2000)
+	std::string filePath;
+	filePath.clear();
+
+	sp::timer timer_now;
+	long long int count_classifier_int(timer_now.getTimeStamp());
+	std::string count_classifier_str = std::to_string(count_classifier_int);
+
+	if(*max<800)
 	{
 		#ifdef DEBUG
 		std::cout << "舍弃" << std::endl;
+		#endif
+
+		#ifdef CLASSIFIER_OUTPUT
+		filePath = "../Video/image/dst/negative/negative_"+count_classifier_str+".jpg";
+		cv::imwrite(filePath, src_grey);
+
+		#ifdef DEBUG
+		std::cout << "输出negative图片成功" << std::endl;
+		#endif
+
 		#endif
 
 		return 0;
@@ -135,6 +154,16 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 
 		#ifdef DEBUG
 		std::cout << "对应编号为" << maxGainArmor << "的装甲板" << std::endl;
+		#endif
+
+		#ifdef CLASSIFIER_OUTPUT
+		filePath = "../Video/image/dst/positive/positive_"+count_classifier_str+".jpg";
+		cv::imwrite(filePath, src_grey);
+
+		#ifdef DEBUG
+		std::cout << "输出positive图片成功" << std::endl;
+		#endif
+
 		#endif
 
 		return maxGainArmor;

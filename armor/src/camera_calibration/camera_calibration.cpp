@@ -189,6 +189,8 @@ int main()
 		StrStm.clear();
 		imageFileName.clear();
 		// string filePath="chess";
+
+
 		string filePath;
 		getline(fin2,filePath);
 		// StrStm<<i+1;
@@ -201,6 +203,7 @@ int main()
 		//undistort(imageSource,newimage,cameraMatrix,distCoeffs);
 		remap(imageSource,newimage,mapx, mapy, INTER_LINEAR);		
 		StrStm.clear();
+		
 		filePath.clear();
 		StrStm<<"./Camera_calibration_photos/after_calibration/after_calibration_";
 		StrStm<<i+1;

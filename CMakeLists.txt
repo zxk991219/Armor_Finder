@@ -9,6 +9,10 @@ project(OpenCV_Armor_Finder_project)
 # via the command line or GUI
 find_package(OpenCV REQUIRED)
 set(CMAKE_CXX_FLAGS "-std=c++11")
+# SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+# SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -g -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3")
 
 # If the package has been found, several variables will
 # be set, you can find the full list with descriptions
