@@ -6,26 +6,26 @@
 #undef DEBUG
 #endif
 
-// 开始define
-
-#define DEBUG
-
-#define USE_NEW_CODE
-
-// #define USE_CAMERA
 #define USE_VIDEO
-
-#define USE_RGB_FILTER
-// #define USE_HSV_FILTER
+// #define USE_CAMERA
 
 #define USE_RED
 // #define USE_BLUE
 
+// #define USE_HSV_FILTER
+#define USE_RGB_FILTER
+
+#define DEBUG
+#define USE_NEW_CODE
+
+// #define SHOW_MONO_COLOR
+// #define SHOW_IMAGEPART_LIGHT
+// #define SHOW_ARMOR_IMAGE
 // #define SHOW_LIGHT
 // #define SHOW_ARMOR
-
 #define SHOW_ARMOR_WHOLE
-#define SHOW_DISTANCE
+// #define SHOW_DISTANCE
+
 
 # include <iostream>
 # include <opencv2/opencv.hpp>
@@ -57,19 +57,17 @@ int main()
                               70//EXPOSURE
                     );
     //capture.open(1)
-
     cv::Mat src;
     cv::Mat src_real;
-
     capture >> src_real; 
-
     #endif
+
 
     #ifdef USE_VIDEO //使用录像
     // capture.open("../Video/2019-10-28-222635.webm");
-    capture.open("../Video/2019-10-28-223802.webm");
+    // capture.open("../Video/2019-10-28-223802.webm");
     // capture.open("../Video/2019-10-28-223826.webm");
-    // capture.open("../Video/2019-10-28-223848.webm");
+    capture.open("../Video/2019-10-28-223848.webm");
     cv::Mat src;
     cv::Mat src_real;
     #endif
@@ -78,6 +76,8 @@ int main()
     {
         for(;;) //读取视频循环
         {
+            timer.reset(); // 开始计时
+
             capture >> src_real;
 
             #ifdef USE_VIDEO
@@ -92,21 +92,16 @@ int main()
             sp::hsvColorFilter(src_real, src);
             #endif
 
-            timer.reset(); // 开始计时
-
             if(src.empty())
                 break;
 
             src = sp::mser(src, src_real);
             
-            // cv::imshow("image_beforeMSER", src_real);
-
-            #ifdef DEBUG
+            #ifdef SHOW_MONO_COLOR
             cv::imshow("image", src);
             #endif
 
             cv::imshow("image_beforeMSER", src_real);
-
 
             std::cout << "程序运行时间：" << timer.get() << "ms" << std::endl; //结束计时
 

@@ -47,7 +47,7 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 	std::cout << "二值化截取图像成功" << std::endl;
 	#endif
 
-	#ifdef DEBUG
+	#ifdef SHOW_ARMOR_IMAGE
 	cv::imshow("src_grey",src_grey);
 	#endif
 	
@@ -68,13 +68,12 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 	
 	int gain = 0; //初始化gain
 	std::vector<int> gain_list; //声明容器gain_list来放置每个图像的gain
+	int count = 1;
 
 	while(getline(template_filename_in, template_filename))
 	{
 		// 模板图像预处理
 		cv::Mat template_image = cv::imread(template_filename); //读入模板图像
-		
-
 
 		cv::Mat template_image_grey;
 		cv::cvtColor(template_image, template_image_grey, CV_RGB2GRAY); //灰度模板图像
@@ -84,8 +83,8 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 		cv::resize(template_image_grey, template_image_grey, cv::Size(cols, rows), (0,0), (0,0), CV_INTER_AREA);
 		
 		#ifdef DEBUG
-		cv::imshow("template_filename",template_image_grey);
-		// std::cout << "读入" << template_filename << std::endl;
+		// cv::imshow("template_filename",template_image_grey);
+		std::cout << "读入" << count << "号装甲板模板" << std::endl;
 		#endif
 
 		// 逐像素获取每个像素的gain并累积
@@ -107,10 +106,11 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 		gain_list.push_back(gain); //将gain加入gain_list
 
 		#ifdef DEBUG
-		std::cout << template_filename << "的gain是" << gain << std::endl; //显示gain
+		std::cout << count << "号装甲板的gain是" << gain << std::endl; //显示gain
 		#endif
 
 		gain = 0; //重置gain
+		count++;
 	}
 
 	auto min = std::min_element(gain_list.begin(), gain_list.end());
@@ -121,7 +121,7 @@ int classifier(const cv::Mat& src, std::string template_filename_list)
 	std::cout << "这组图像的最大gain是" << *max << std::endl;
 	#endif
 
-	if(*max<1000)
+	if(*max<2000)
 	{
 		#ifdef DEBUG
 		std::cout << "舍弃" << std::endl;
