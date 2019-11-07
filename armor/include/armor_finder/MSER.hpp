@@ -6,6 +6,7 @@
 #include "proportion_thresh.hpp"
 #include <algorithm>
 #include "distance.hpp"
+#include "classifier.hpp"
 
 
 #ifdef USE_NEW_CODE //新代码在下面
@@ -316,7 +317,7 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 		bboxes_armor_selected.push_back(bboxes_armor[m]);
 
 		#ifdef DEBUG
-		std::cout<<"pushed";
+		std::cout<<"pushed"<<std::endl;
 		#endif
 	}
 
@@ -341,20 +342,48 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 		int rect_armor_y = (bboxes_armor_selected[i].y+bboxes_armor_selected[i].height/2.0)-rect_armor_height/2.0;
 		cv::Rect rect_armor(rect_armor_x, rect_armor_y, rect_armor_width, rect_armor_height);
 
-		// 显示完整装甲板框
-		#ifdef SHOW_ARMOR_WHOLE
+		// 放入分类器进行比较并得出相应装甲板编号
+		cv::Mat image_rect_armor=mat_real(rect_armor); //抠图
 
 		#ifdef DEBUG
-		cv::rectangle(mat, rect_armor, {255}, 2);
+		std::cout << "截取装甲板图像成功" << std::endl;
 		#endif
 
-		cv::rectangle(mat_real, rect_armor, {255,0,0}, 2);
-		#endif
+		// 分类器获取装甲板编号
+		int num_armor = sp::classifier(image_rect_armor, "../Video/image/src/armor/image_positive_list.txt");
+		// int num_armor = 1;
 
-		// 显示距离
-		#ifdef SHOW_DISTANCE
-		sp::getBoxDistance(mat_real, bboxes_armor_selected);
-		#endif
+		if(num_armor!=0)
+		{
+			// 显示完整装甲板框
+			#ifdef SHOW_ARMOR_WHOLE
+
+			#ifdef DEBUG
+			cv::rectangle(mat, rect_armor, {255}, 2);
+			#endif
+
+			#ifdef USE_RED
+			cv::rectangle(mat_real, rect_armor, {0,0,255}, 2);
+			#endif
+
+			#ifdef USE_BLUE
+			cv::rectangle(mat_real, rect_armor, {255,0,0}, 2);
+			#endif
+
+			#endif
+
+			// 在原图上显示装甲板编号
+			std::string num_armor_str = std::to_string(num_armor);
+			sp::drawText(mat_real, rect_armor, num_armor_str);
+
+			// 显示距离
+			#ifdef SHOW_DISTANCE
+			sp::getBoxDistance(mat_real, bboxes_armor_selected);
+			#endif
+		}
+		else {}
+
+		
 	}
 	
 
