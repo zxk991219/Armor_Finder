@@ -16,7 +16,7 @@
 // #define USE_HSV_FILTER
 #define USE_RGB_FILTER
 
-#define DEBUG
+// #define DEBUG
 #define USE_NEW_CODE
 
 // #define SHOW_MONO_COLOR
@@ -82,6 +82,7 @@ int main()
     cv::FileStorage fs("./out_camera_data.xml", cv::FileStorage::READ);
     fs["camera_matrix"] >> cameraMatrix;
     fs["distortion_coefficients"] >> distCoeffs;
+    #endif
 
 
     if(capture.isOpened())
