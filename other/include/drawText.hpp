@@ -24,13 +24,22 @@
 
 namespace sp
 {
-    void drawText(cv::Mat& image);
-    void drawText(cv::Mat& image)
+    void drawText(cv::Mat& mat_real, const cv::Rect& rect_armor, const std::string str)
 {
-    cv::putText(image, "Video",
-    cv::Point(20,50),
-    CV_FONT_HERSHEY_COMPLEX, 1,
-    cv::Scalar(255,255,255), 1,
+    cv::Point point(rect_armor.x, rect_armor.y+rect_armor.height*4/5);
+
+    cv::putText(mat_real, str,
+    point,
+    CV_FONT_HERSHEY_COMPLEX_SMALL, 1,
+    
+    #ifdef USE_RED
+    cv::Scalar(0,0,255), 0.5,
+    #endif
+
+    #ifdef USE_BLUE
+    cv::Scalar(255,0,0), 1,
+    #endif
+
     LINE_MAX);
 }
 }

@@ -6,6 +6,10 @@
 #include "proportion_thresh.hpp"
 #include <algorithm>
 #include "distance.hpp"
+#include "classifier.hpp"
+
+
+
 
 
 #ifdef USE_NEW_CODE //新代码在下面
@@ -33,26 +37,33 @@ bool bboxes_light_is_ok(const cv::Mat& in, double max_val, double proportion, in
 	int rows = in.rows;
 	int cols = in.cols;
 	
+	cv::cvtColor(in, in2, CV_RGB2HSV);
+	CvScalar scalar;
 
 	if(in.isContinuous())
 	{
 		cols *= rows;
 		rows = 1;
 	}
-	std::vector<uchar> color_value(rows*cols);
+
+	IplImage* ipl_in2 = cvCreateImage(cvSize(rows,cols), IPL_DEPTH_8U, 3);
+	*ipl_in2 = IplImage(in2);
+
+	std::vector<int> color_value(rows*cols);
 	int pos = 0;
 	for(int i=0;i<rows;i++)
 	{
 		for(int j=0;j<cols;j++)
 		{
-			color_value[pos++] = in.at<uchar>(i,j);
+			scalar = cvGet2D(ipl_in2, i, j);
+			color_value[pos++] = (int)scalar.val[2];
 		}
 	}
 	std::nth_element(color_value.begin(), color_value.end()-rows*cols*proportion, color_value.end());
 	auto thre_iterator = color_value.end()-rows*cols*proportion;
-	uchar threshold = *thre_iterator;
+	int threshold_int = *thre_iterator;
 
-	int threshold_int = (int)threshold;
+	// int threshold_int = (int)threshold;
 
 	#ifdef DEBUG
 	std::cout << "threshold=" << threshold_int << std::endl; //打印计算得出的threshold
@@ -61,16 +72,12 @@ bool bboxes_light_is_ok(const cv::Mat& in, double max_val, double proportion, in
 	if(threshold_int>=thresh_value) // 筛亮度
 	{
 		// hsv筛颜色
-		cv::cvtColor(in, in2, CV_RGB2HSV);
-		CvScalar scalar;
 
 		// 获得bboxes_light的中点坐标和中点hsv亮度
-		IplImage* ipl_in2 = cvCreateImage(cvSize(rows,cols), IPL_DEPTH_8U, 3);
-		*ipl_in2 = IplImage(in2);
 		scalar = cvGet2D(ipl_in2, rows/2, cols/2);
 
 		if((int)scalar.val[1]>254
-			// && (int)scalar.val[1]<30
+			&& (int)scalar.val[1]<30
 			&& (int)scalar.val[2]>254)
 		{
 			#ifdef DEBUG
@@ -124,6 +131,7 @@ bool bboxes_armor_isok(const cv::Rect& rect_l, const cv::Rect& rect_r)
 	&& bbox_armor_height/bbox_armor_width>0.2
 	&& bbox_armor_height/bbox_light_height>0.9
 	&& bbox_armor_height/bbox_light_height<1.5
+	&& (std::abs(rect_l.y-rect_r.y)<(bbox_light_height/7.0))
 	// && rect_r.width/rect_l.width>0.7
 	// && rect_r.width/rect_l.width<1.3
 	)
@@ -234,7 +242,7 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 			// 画灯条矩形
 			#ifdef SHOW_LIGHT
 
-			#ifdef DEBUG
+			#ifdef SHOW_MONO_COLOR
 			cv::rectangle(mat, bboxes.front(), {255}, 2);
 			#endif
 
@@ -273,14 +281,14 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 
 			if(bboxes_light_is_ok(imagePart, 255, thresh_binar, thresh_value))
 			{
-				#ifdef DEBUG
+				#ifdef SHOW_IMAGEPART_LIGHT
 				cv::imshow("imagePart",imagePart);
 				#endif
 
 				// 画灯条矩形
 				#ifdef SHOW_LIGHT
 
-				#ifdef DEBUG				
+				#ifdef SHOW_MONO_COLOR				
 				cv::rectangle(mat, bboxes[i], {255}, 2);
 				#endif
 
@@ -316,7 +324,7 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 		bboxes_armor_selected.push_back(bboxes_armor[m]);
 
 		#ifdef DEBUG
-		std::cout<<"pushed";
+		std::cout<<"pushed"<<std::endl;
 		#endif
 	}
 
@@ -325,7 +333,7 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 		// 画装甲板矩形
 		#ifdef SHOW_ARMOR
 
-		#ifdef DEBUG
+		#ifdef SHOW_MONO_COLOR
 		cv::rectangle(mat, bboxes_armor_selected[p], {255}, 2);
 		#endif
 
@@ -341,26 +349,58 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 		int rect_armor_y = (bboxes_armor_selected[i].y+bboxes_armor_selected[i].height/2.0)-rect_armor_height/2.0;
 		cv::Rect rect_armor(rect_armor_x, rect_armor_y, rect_armor_width, rect_armor_height);
 
-		// 显示完整装甲板框
-		#ifdef SHOW_ARMOR_WHOLE
+
+		if(rect_armor.x>0 && rect_armor.y>0 && (rect_armor.x+rect_armor.width)<640 && (rect_armor.y+rect_armor.height)<480)
+		{
+		// 放入分类器进行比较并得出相应装甲板编号
+		cv::Mat image_rect_armor=mat_real(rect_armor); //抠图
 
 		#ifdef DEBUG
-		cv::rectangle(mat, rect_armor, {255}, 2);
+		std::cout << "截取装甲板图像成功" << std::endl;
 		#endif
 
-		cv::rectangle(mat_real, rect_armor, {255,0,0}, 2);
-		#endif
+		// 分类器获取装甲板编号
+		int num_armor = sp::classifier(image_rect_armor, "../Video/image/src/armor/image_positive_list.txt");
+		// int num_armor = 1;
 
-		// 显示距离
-		#ifdef SHOW_DISTANCE
-		sp::getBoxDistance(mat_real, bboxes_armor_selected);
-		#endif
+		if(num_armor!=0)
+		{
+			// 显示完整装甲板框
+			#ifdef SHOW_ARMOR_WHOLE
+
+			#ifdef SHOW_MONO_COLOR
+			cv::rectangle(mat, rect_armor, {255}, 2);
+			#endif
+
+			#ifdef USE_RED
+			cv::rectangle(mat_real, rect_armor, {0,0,255}, 2);
+			#endif
+
+			#ifdef USE_BLUE
+			cv::rectangle(mat_real, rect_armor, {255,0,0}, 2);
+			#endif
+
+			#endif
+
+			// 在原图上显示装甲板编号
+			std::string num_armor_str = std::to_string(num_armor);
+			sp::drawText(mat_real, rect_armor, "#"+num_armor_str);
+
+			// 显示距离
+			#ifdef SHOW_DISTANCE
+			sp::getBoxDistance(mat_real, bboxes_armor_selected);
+			#endif
+		}
+		else {}
+		}
+
+		
 	}
 	
 
 	#ifdef DEBUG
 	std::string cnt_str = std::to_string(cnt);	
-	std::cout << "Answer: "+cnt_str+" bboxes" << '\n';
+	std::cout << "筛选得: "+cnt_str+" bboxes" << '\n';
 	#endif
 
 	return mat;
@@ -381,6 +421,5 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 
 
 #else //旧代码在下面
-
 
 #endif
