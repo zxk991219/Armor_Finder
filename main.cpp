@@ -3,6 +3,7 @@
 #endif
 
 #ifdef DEBUG
+
 #undef DEBUG
 #endif
 
@@ -35,6 +36,7 @@
 # include "armor/include/show_images/show_images.hpp"
 # include "armor/include/armor_finder/MSER.hpp"
 # include "armor/include/armor_finder/color_filter.hpp"
+# include "armor/include/armor_finder/PNP.hpp"
 // # include "armor/include/armor_finder/C-color.hpp"
 // # include "armor/include/armor_finder/distance.hpp"
 
@@ -71,8 +73,17 @@ int main()
     // capture.open("../Video/2019-10-28-223848.webm");
     cv::Mat src;
     cv::Mat src_real;
-    #endif
-    
+
+    cv::Mat cameraMatrix;
+    cv::Mat distCoeffs;
+
+    capture >> src_real; 
+
+    cv::FileStorage fs("./out_camera_data.xml", cv::FileStorage::READ);
+    fs["camera_matrix"] >> cameraMatrix;
+    fs["distortion_coefficients"] >> distCoeffs;
+
+
     if(capture.isOpened())
     {
         for(;;) //读取视频循环
