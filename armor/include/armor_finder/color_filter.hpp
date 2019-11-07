@@ -58,9 +58,10 @@ void hsvColorFilter(cv::Mat& inputImage, cv::Mat& outputImage)
 
             # ifdef USE_RED
 			if (!(
-                (((s_hsv.val[0]>0)&&(s_hsv.val[0]<10)) || (s_hsv.val[0]>156)&&(s_hsv.val[0]<180))
+                // (((s_hsv.val[0]>0)&&(s_hsv.val[0]<10)) || (s_hsv.val[0]>156)&&(s_hsv.val[0]<180))
                 // && ((s_hsv.val[1]>43)&&(s_hsv.val[1]<255))
                 // && ((s_hsv.val[2]>46)&&(s_hsv.val[2]<221))
+                (s_hsv.val[2]>250)
                 ))
 			{
 				s.val[0]=0;
