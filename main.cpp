@@ -37,6 +37,7 @@
 # include "armor/include/show_images/show_images.hpp"
 # include "armor/include/armor_finder/MSER.hpp"
 # include "armor/include/armor_finder/color_filter.hpp"
+# include "armor/include/armor_finder/PNP.hpp"
 // # include "armor/include/armor_finder/C-color.hpp"
 // # include "armor/include/armor_finder/distance.hpp"
 
@@ -75,7 +76,15 @@ int main()
     
     cv::Mat src;
     cv::Mat src_real;
+
+    cv::Mat cameraMatrix;
+    cv::Mat distCoeffs;
+
     capture >> src_real; 
+
+    cv::FileStorage fs("./out_camera_data.xml", cv::FileStorage::READ);
+    fs["camera_matrix"] >> cameraMatrix;
+    fs["distortion_coefficients"] >> distCoeffs;
 
 
     if(capture.isOpened())
