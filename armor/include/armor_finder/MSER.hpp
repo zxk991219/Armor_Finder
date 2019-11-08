@@ -5,10 +5,16 @@
 #include <vector>
 #include "proportion_thresh.hpp"
 #include <algorithm>
-#include "distance.hpp"
+// #include "distance.hpp"
 #include "classifier.hpp"
+<<<<<<< HEAD
 #include "PNP.hpp"
+=======
+>>>>>>> upstream/master
 
+#ifdef SHOW_DISTANCE
+#include "PNP.hpp"
+#endif
 
 
 
@@ -204,7 +210,6 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 	std::vector<cv::Rect>               bboxes_light; // 灯条矩形
 	std::vector<cv::Rect>               bboxes_armor; // 灯条匹配矩形
 	std::vector<cv::Rect>               bboxes_armor_selected; // 筛选后的灯条匹配矩形
-	std::vector<cv::Rect>               bboxes_armor_whole; // 装甲板矩形
 
 
 	mser->detectRegions(mat, contours, bboxes); // 检测边缘
@@ -387,8 +392,8 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 
 			// 显示距离
 			#ifdef SHOW_DISTANCE
-			//sp::getBoxDistance(mat_real, bboxes_armor_whole);
-			sp::get_distance(mat_real, bboxes_armor_whole);
+			//sp::getBoxDistance(mat_real, bboxes_armor_selected);
+			sp::get_distance(mat_real, rect_armor);
 			#endif
 		}
 		else {}

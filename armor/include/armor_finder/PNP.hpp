@@ -1,4 +1,4 @@
- #pragma once
+#pragma once
 
 # include <iostream>
 # include <opencv2/opencv.hpp>
@@ -13,7 +13,7 @@
 namespace sp
 {
 
-    void get_distance(cv::Mat frame, std::vector<cv::Rect> bboxes_armor)
+    void get_distance(cv::Mat& frame, cv::Rect bboxes_armor)
 {   
     cv::Mat cam;
     cv::Mat dis;
@@ -22,9 +22,7 @@ namespace sp
     fs["camera_matrix"] >> cam;
     fs["distortion_coefficients"] >> dis;//传入相机的内参和外参
 
-    for(int i=0;i<bboxes_armor.size();++i)
- {
-    cv::Rect rect=bboxes_armor[i];
+    cv::Rect rect=bboxes_armor;
     std::vector<cv::Point2f> pnts=std::vector<cv::Point2f>{
         cv::Point2f(rect.tl().x,rect.tl().y),
         cv::Point2f(rect.tl().x+rect.width,rect.tl().y),
@@ -57,9 +55,7 @@ namespace sp
     cv::imencode(".bmp", tVec, buff);
     std::string text(reinterpret_cast<char*>(&buff[0]), buff.size());
     
-    sp::drawText(frame,bboxes_armor[i],text );
-  }
-
+    sp::drawText(frame, bboxes_armor, text);
  }
 }
 //         void calAngle(cv::Mat cam,cv::Mat dis,int x,int y)
@@ -91,6 +87,7 @@ namespace sp
 
 
 
+<<<<<<< HEAD
 
 
 
@@ -102,6 +99,8 @@ namespace sp
 
 
 
+=======
+>>>>>>> upstream/master
 #else //旧代码在下面
 
 int main()
