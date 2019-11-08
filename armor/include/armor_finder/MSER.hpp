@@ -7,10 +7,6 @@
 #include <algorithm>
 // #include "distance.hpp"
 #include "classifier.hpp"
-<<<<<<< HEAD
-#include "PNP.hpp"
-=======
->>>>>>> upstream/master
 
 #ifdef SHOW_DISTANCE
 #include "PNP.hpp"
