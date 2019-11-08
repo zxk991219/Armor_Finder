@@ -16,17 +16,17 @@
 // #define USE_HSV_FILTER
 #define USE_RGB_FILTER
 
-// #define DEBUG
+#define DEBUG
 #define USE_NEW_CODE
 
-// #define SHOW_MONO_COLOR
-// #define SHOW_IMAGEPART_LIGHT
-// #define SHOW_ARMOR_IMAGE
-// #define SHOW_LIGHT
-// #define SHOW_ARMOR
-#define SHOW_ARMOR_WHOLE
-// #define SHOW_DISTANCE
-#define CLASSIFIER_OUTPUT
+// #define SHOW_MONO_COLOR //显示RGB通道分离结果
+// #define SHOW_IMAGEPART_LIGHT //显示灯条矩形截图
+// #define SHOW_ARMOR_IMAGE //显示装甲板矩形截图
+// #define SHOW_LIGHT //显示灯条矩形
+// #define SHOW_ARMOR //显示灯条匹配的装甲板矩形
+#define SHOW_ARMOR_WHOLE //显示完整装甲板矩形
+// #define SHOW_DISTANCE //显示距离
+// #define CLASSIFIER_OUTPUT //输出分类器结果到"Video/image/dst/negative/和positive"
 
 
 # include <iostream>
@@ -36,7 +36,7 @@
 # include "armor/include/show_images/show_images.hpp"
 # include "armor/include/armor_finder/MSER.hpp"
 # include "armor/include/armor_finder/color_filter.hpp"
-//# include "armor/include/armor_finder/PNP.hpp"
+// # include "armor/include/armor_finder/PNP.hpp"
 // # include "armor/include/armor_finder/C-color.hpp"
 // # include "armor/include/armor_finder/distance.hpp"
 
