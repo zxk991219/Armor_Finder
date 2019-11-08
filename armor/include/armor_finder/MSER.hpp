@@ -131,7 +131,7 @@ bool bboxes_armor_isok(const cv::Rect& rect_l, const cv::Rect& rect_r)
 	&& bbox_armor_height/bbox_armor_width>0.2
 	&& bbox_armor_height/bbox_light_height>0.9
 	&& bbox_armor_height/bbox_light_height<1.5
-	&& (std::abs(rect_l.y-rect_r.y)<(bbox_light_height/7.0))
+	&& (std::abs(rect_l.y-rect_r.y)<(bbox_light_height/6.0))
 	// && rect_r.width/rect_l.width>0.7
 	// && rect_r.width/rect_l.width<1.3
 	)
@@ -361,7 +361,6 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 
 		// 分类器获取装甲板编号
 		int num_armor = sp::classifier(image_rect_armor, "../Video/image/src/armor/image_positive_list.txt");
-		// int num_armor = 1;
 
 		if(num_armor!=0)
 		{
