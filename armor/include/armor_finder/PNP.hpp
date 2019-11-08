@@ -2,11 +2,13 @@
 
 # include <iostream>
 # include <opencv2/opencv.hpp>
+# include <opencv2/calib3d.hpp>
 # include "../../../other/include/drawText.hpp"
 
 
 # define HALF_WIDTH 7.10
 # define HALF_HEIGHT 6.25
+# define PI 3.14
 
 #ifdef USE_NEW_CODE //新代码在下面
 
@@ -15,12 +17,13 @@ namespace sp
 
     void get_distance(cv::Mat& frame, cv::Rect bboxes_armor)
 {   
-    cv::Mat cam;
-    cv::Mat dis;
-
-    cv::FileStorage fs("../out_camera_data.xml", cv::FileStorage::READ);
-    fs["camera_matrix"] >> cam;
-    fs["distortion_coefficients"] >> dis;//传入相机的内参和外参
+    double m[3][3] = {{1056.641597953005, 0, 958.1078670170519}, { 0, 1055.821668018513, 558.7308899751256}, {0, 0, 1}};
+    cv::Mat cam= cv::Mat(3, 3, CV_64F, m);//相机内参
+    double n[5]={-0.4101674487087525,0.2060326419033235, 0.0007446583829303401, -0.0009071701383907473, -0.05685326030318479};
+    cv::Mat dis=cv::Mat(1,5, CV_64F, n);//畸变参数
+    // cv::FileStorage fs("../out_camera_data.xml", cv::FileStorage::READ);
+    // fs["camera_matrix"] >> cam;
+    // fs["distortion_coefficients"] >> dis;//传入相机的内参和外参
 
     cv::Rect rect=bboxes_armor;
     std::vector<cv::Point2f> pnts=std::vector<cv::Point2f>{
@@ -35,26 +38,56 @@ namespace sp
             cv::Point3f(HALF_WIDTH, HALF_HEIGHT, 0),	//br
             cv::Point3f(-HALF_WIDTH, HALF_HEIGHT, 0)	//bl
     };//设置世界坐标系中的坐标
-    cv::Mat rVec = cv::Mat::zeros(3, 1, CV_64FC1);//init rvec
-    cv::Mat tVec = cv::Mat::zeros(3, 1, CV_64FC1);//init tvec
+    cv::Mat rVec= cv::Mat::zeros(3, 1, CV_64FC1);//init rvec
+    cv::Mat tVec= cv::Mat::zeros(3, 1, CV_64FC1);//init tvec
+    //初始化    
     cv::solvePnP(obj,pnts,cam,dis,rVec,tVec,false,cv::SOLVEPNP_ITERATIVE);
      //利用solvepnp解算出平移向量和旋转向量
-    double rm[3][3];
-    cv::Mat rotMat(3,3,CV_64FC1,rm);//共享数据
-    cv::Rodrigues(rVec,rotMat);
-    float theta_z = atan2(rm[1][0], rm[0][0])*57.2958;
 
-    float theta_y = atan2(-rm[2][0], sqrt(rm[2][0] * rm[2][0] + rm[2][2] * rm[2][2]))*57.2958;
+    // double rm[3][3];
+    // cv::Mat rotM=cv::Mat::zeros(3,3,CV_64FC1);//共享数据
 
-    float theta_x = atan2(rm[2][1], rm[2][2])*57.2958;//解算角度
+    // cv::Rodrigues(rvec, rotM);  //将旋转向量变换成旋转矩阵(无法使用)
+    // cv::Rodrigues(tvec, rotT);
+    // float theta_z = atan2(rm[1][0], rm[0][0])*57.2958;
 
-    std::cout<<theta_z<<theta_y<<theta_z<<std::endl;
+    // float theta_y = atan2(-rm[2][0], sqrt(rm[2][0] * rm[2][0] + rm[2][2] * rm[2][2]))*57.2958;
 
-    std::vector<uchar>  buff;//将mat型转换为string
-    cv::imencode(".bmp", tVec, buff);
-    std::string text(reinterpret_cast<char*>(&buff[0]), buff.size());
+    // float theta_x = atan2(rm[2][1], rm[2][2])*57.2958;//解算角度
+
+    //根据旋转矩阵求出坐标旋转角
+    double theta_x = atan2(rVec.at<double>(2, 1), rVec.at<double>(2, 2));
+    double theta_y = atan2(-rVec.at<double>(2, 0),
+    sqrt(rVec.at<double>(2, 1)*rVec.at<double>(2, 1) + rVec.at<double>(2, 2)*rVec.at<double>(2, 2)));
+    double theta_z = atan2(rVec.at<double>(1, 0), rVec.at<double>(0, 0));
+ 
+    //将弧度转化为角度
+    theta_x = theta_x * (180 / PI);
+    theta_y = theta_y * (180 / PI);
+    theta_z = theta_z * (180 / PI);
+
+    std::cout<<"Roll:"<<theta_z<<"Yaw:"<<theta_y<<"Pitch:"<<theta_x<<std::endl;
+
+    // std::vector<uchar>  buff;//将mat型转换为string
+    // cv::imencode(".bmp", tVec, buff);
+    // std::string text(reinterpret_cast<char*>(&buff[0]), buff.size());
     
-    sp::drawText(frame, bboxes_armor, text);
+    double data= tVec.at<double>(2,0);//提出z轴坐标
+    std::string text= std::to_string( data);
+
+    cv::Point origin;
+         origin.x = rect.tl().x+rect.width;
+	     origin.y = rect.br().y+rect.height;
+    cv::putText( frame,//每一帧的图像
+                      text,//文本内容
+                      origin,//文本框左下角
+                      cv::FONT_HERSHEY_SIMPLEX,//字体
+                      1,//字体尺寸（大小）
+                      cv::Scalar(0,0,255),//字体颜色
+                      4,//字体粗细
+                      8,//线型
+                      0);
+
  }
 }
 //         void calAngle(cv::Mat cam,cv::Mat dis,int x,int y)
