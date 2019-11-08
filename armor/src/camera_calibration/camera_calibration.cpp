@@ -12,7 +12,7 @@ using namespace std;
  
 int main() 
 {
-	ifstream fin("../Camera_calibration_files/calibdata.txt"); /* 标定所用图像文件的路径 */
+	ifstream fin("../Camera_calibration_files/calibration.txt"); /* 标定所用图像文件的路径 */
 	ofstream fout("../Camera_calibration_files/caliberation_result.txt");  /* 保存标定结果的文件 */	
 	//读取每一幅图像，从中提取出角点，然后对角点进行亚像素精确化	
 	cout<<"开始提取角点………………";
