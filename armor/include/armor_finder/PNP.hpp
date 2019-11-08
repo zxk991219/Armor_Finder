@@ -1,6 +1,8 @@
+ #pragma once
+
 # include <iostream>
 # include <opencv2/opencv.hpp>
-# include "other/include/drawText.hpp"
+# include "../../../other/include/drawText.hpp"
 
 
 # define HALF_WIDTH 7.10
@@ -48,6 +50,7 @@ namespace sp
 
     float theta_x = atan2(rm[2][1], rm[2][2])*57.2958;//解算角度
 
+
     std::cout<<theta_z<<theta_y<<theta_z<<std::endl;
 
     std::vector<uchar>  buff;//将mat型转换为string
@@ -94,7 +97,7 @@ namespace sp
 
 
 
-}
+
  
 
 

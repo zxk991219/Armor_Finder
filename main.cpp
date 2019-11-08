@@ -25,7 +25,7 @@
 // #define SHOW_LIGHT
 // #define SHOW_ARMOR
 #define SHOW_ARMOR_WHOLE
-// #define SHOW_DISTANCE
+#define SHOW_DISTANCE
 #define CLASSIFIER_OUTPUT
 
 
@@ -36,7 +36,7 @@
 # include "armor/include/show_images/show_images.hpp"
 # include "armor/include/armor_finder/MSER.hpp"
 # include "armor/include/armor_finder/color_filter.hpp"
-//# include "armor/include/armor_finder/PNP.hpp"
+# include "armor/include/armor_finder/PNP.hpp"
 // # include "armor/include/armor_finder/C-color.hpp"
 // # include "armor/include/armor_finder/distance.hpp"
 

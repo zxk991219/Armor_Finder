@@ -7,7 +7,7 @@
 #include <algorithm>
 #include "distance.hpp"
 #include "classifier.hpp"
-#include "armor/include/armor_finder/PNP.hpp"
+#include "PNP.hpp"
 
 
 
@@ -387,8 +387,8 @@ cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 
 			// 显示距离
 			#ifdef SHOW_DISTANCE
-			//sp::getBoxDistance(mat_real, bboxes_armor_selected);
-			sp::get_distance(mat_real, bboxes_armor_selected);
+			//sp::getBoxDistance(mat_real, bboxes_armor_whole);
+			sp::get_distance(mat_real, bboxes_armor_whole);
 			#endif
 		}
 		else {}
