@@ -46,20 +46,15 @@ namespace sp
 
     // double rm[3][3];
     // cv::Mat rotM=cv::Mat::zeros(3,3,CV_64FC1);//共享数据
+     cv::Mat rotM= cv::Mat::zeros(3, 3, CV_64FC1);
+     cv::Rodrigues(rVec, rotM);  //将旋转向量变换成旋转矩阵
 
-    // cv::Rodrigues(rvec, rotM);  //将旋转向量变换成旋转矩阵(无法使用)
-    // cv::Rodrigues(tvec, rotT);
-    // float theta_z = atan2(rm[1][0], rm[0][0])*57.2958;
-
-    // float theta_y = atan2(-rm[2][0], sqrt(rm[2][0] * rm[2][0] + rm[2][2] * rm[2][2]))*57.2958;
-
-    // float theta_x = atan2(rm[2][1], rm[2][2])*57.2958;//解算角度
 
     //根据旋转矩阵求出坐标旋转角
-    double theta_x = atan2(rVec.at<double>(2, 1), rVec.at<double>(2, 2));
-    double theta_y = atan2(-rVec.at<double>(2, 0),
-    sqrt(rVec.at<double>(2, 1)*rVec.at<double>(2, 1) + rVec.at<double>(2, 2)*rVec.at<double>(2, 2)));
-    double theta_z = atan2(rVec.at<double>(1, 0), rVec.at<double>(0, 0));
+    double theta_x = atan2(rotM.at<double>(2, 1), rotM.at<double>(2, 2));
+    double theta_y = atan2(-rotM.at<double>(2, 0),
+    sqrt(rotM.at<double>(2, 1)*rotM.at<double>(2, 1) + rotM.at<double>(2, 2)*rotM.at<double>(2, 2)));
+    double theta_z = atan2(rotM.at<double>(1, 0), rotM.at<double>(0, 0));
  
     //将弧度转化为角度
     theta_x = theta_x * (180 / PI);
