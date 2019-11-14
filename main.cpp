@@ -3,7 +3,6 @@
 #endif
 
 #ifdef DEBUG
-
 #undef DEBUG
 #endif
 
@@ -16,7 +15,7 @@
 // #define USE_HSV_FILTER
 #define USE_RGB_FILTER
 
-#define DEBUG
+// #define DEBUG
 #define USE_NEW_CODE
 
 // #define SHOW_MONO_COLOR //显示RGB通道分离结果

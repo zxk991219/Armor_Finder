@@ -166,7 +166,7 @@ cv::Rect get_armor(const cv::Rect& rect_l, const cv::Rect& rect_r)
 
 cv::Mat& mser(cv::Mat& mat, cv::Mat& mat_real)
 {
-	cv::Mat img_show;
+	// cv::Mat img_show;
 	
 	// cv::resize(mat, mat, {640, 480});
 	
