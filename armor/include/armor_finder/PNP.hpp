@@ -57,9 +57,9 @@ namespace sp
     double theta_z = atan2(rotM.at<double>(1, 0), rotM.at<double>(0, 0));
  
     //将弧度转化为角度
-    theta_x = theta_x * (180 / PI);
-    theta_y = theta_y * (180 / PI);
-    theta_z = theta_z * (180 / PI);
+    // theta_x = theta_x * (180 / PI);
+    // theta_y = theta_y * (180 / PI);
+    // theta_z = theta_z * (180 / PI);
 
     std::cout<<"Roll:"<<theta_z<<"Yaw:"<<theta_y<<"Pitch:"<<theta_x<<std::endl;
 
